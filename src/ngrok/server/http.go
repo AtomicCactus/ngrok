@@ -80,6 +80,15 @@ func httpHandler(c conn.Conn, proto string) {
 	host := strings.ToLower(vhostConn.Host())
 	auth := vhostConn.Request.Header.Get("Authorization")
 
+	// try fix Host header with default port
+	if (strings.Contains(host, ":")) {
+		// Host header contains a port number
+		parts := strings.Split(host, ":")
+		if ((proto == "http" && parts[1] == "80") || (proto == "https" && parts[1] == "443")) {
+			host = parts[0]
+		}
+	}
+
 	// done reading mux data, free up the request memory
 	vhostConn.Free()
 
